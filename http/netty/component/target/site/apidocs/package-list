@@ -1,5 +1,0 @@
-org.wso2.carbon.transport.http.netty
-org.wso2.carbon.transport.http.netty.internal
-org.wso2.carbon.transport.http.netty.internal.config
-org.wso2.carbon.transport.http.netty.listener
-org.wso2.carbon.transport.http.netty.listener.ssl
