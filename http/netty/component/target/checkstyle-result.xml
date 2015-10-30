@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<checkstyle version="6.2">
+<file name="/Users/madhuranga/github/gateway/carbon-transports/http/netty/component/src/main/java/org/wso2/carbon/transport/http/netty/Constants.java">
+</file>
+<file name="/Users/madhuranga/github/gateway/carbon-transports/http/netty/component/src/main/java/org/wso2/carbon/transport/http/netty/internal/config/ListenerConfiguration.java">
+</file>
+<file name="/Users/madhuranga/github/gateway/carbon-transports/http/netty/component/src/main/java/org/wso2/carbon/transport/http/netty/internal/config/package-info.java">
+</file>
+<file name="/Users/madhuranga/github/gateway/carbon-transports/http/netty/component/src/main/java/org/wso2/carbon/transport/http/netty/internal/config/Parameter.java">
+</file>
+<file name="/Users/madhuranga/github/gateway/carbon-transports/http/netty/component/src/main/java/org/wso2/carbon/transport/http/netty/internal/config/SenderConfiguration.java">
+</file>
+<file name="/Users/madhuranga/github/gateway/carbon-transports/http/netty/component/src/main/java/org/wso2/carbon/transport/http/netty/internal/config/TransportConfigurationBuilder.java">
+</file>
+<file name="/Users/madhuranga/github/gateway/carbon-transports/http/netty/component/src/main/java/org/wso2/carbon/transport/http/netty/internal/config/TransportsConfiguration.java">
+</file>
+<file name="/Users/madhuranga/github/gateway/carbon-transports/http/netty/component/src/main/java/org/wso2/carbon/transport/http/netty/internal/NettyTransportActivator.java">
+</file>
+<file name="/Users/madhuranga/github/gateway/carbon-transports/http/netty/component/src/main/java/org/wso2/carbon/transport/http/netty/internal/NettyTransportDataHolder.java">
+</file>
+<file name="/Users/madhuranga/github/gateway/carbon-transports/http/netty/component/src/main/java/org/wso2/carbon/transport/http/netty/internal/NettyTransportServiceComponent.java">
+</file>
+<file name="/Users/madhuranga/github/gateway/carbon-transports/http/netty/component/src/main/java/org/wso2/carbon/transport/http/netty/internal/TransportServiceCapabilityProvider.java">
+</file>
+<file name="/Users/madhuranga/github/gateway/carbon-transports/http/netty/component/src/main/java/org/wso2/carbon/transport/http/netty/listener/CarbonNettyServerInitializer.java">
+</file>
+<file name="/Users/madhuranga/github/gateway/carbon-transports/http/netty/component/src/main/java/org/wso2/carbon/transport/http/netty/listener/NettyListener.java">
+</file>
+<file name="/Users/madhuranga/github/gateway/carbon-transports/http/netty/component/src/main/java/org/wso2/carbon/transport/http/netty/listener/NettyServerInitializer.java">
+</file>
+<file name="/Users/madhuranga/github/gateway/carbon-transports/http/netty/component/src/main/java/org/wso2/carbon/transport/http/netty/listener/ssl/SSLConfig.java">
+</file>
+<file name="/Users/madhuranga/github/gateway/carbon-transports/http/netty/component/src/main/java/org/wso2/carbon/transport/http/netty/listener/ssl/SSLHandlerFactory.java">
+</file>
+<file name="/Users/madhuranga/github/gateway/carbon-transports/http/netty/component/src/main/resources/log4j.properties">
+</file>
+<file name="/Users/madhuranga/github/gateway/carbon-transports/http/netty/component/src/main/resources/logging.properties">
+</file>
+<file name="/Users/madhuranga/github/gateway/carbon-transports/http/netty/component/src/main/resources/sample.properties">
+</file>
+</checkstyle>
