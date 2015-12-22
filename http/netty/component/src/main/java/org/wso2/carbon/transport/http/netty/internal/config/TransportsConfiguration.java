@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2015 WSO2 Inc. (http://wso2.com) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -41,6 +41,10 @@ public class TransportsConfiguration {
         HashSet<ListenerConfiguration> listenerConfigurations = new HashSet<>();
         listenerConfigurations.add(listenerConfiguration);
         defaultConfig.setListenerConfigurations(listenerConfigurations);
+        SenderConfiguration senderConfiguration = SenderConfiguration.getDefault();
+        HashSet<SenderConfiguration> senderConfigurations =  new HashSet<>();
+        senderConfigurations.add(senderConfiguration);
+        defaultConfig.setSenderConfigurations(senderConfigurations);
         return defaultConfig;
     }
 
@@ -48,14 +52,27 @@ public class TransportsConfiguration {
     @XmlElement(name = "listener")
     private Set<ListenerConfiguration> listenerConfigurations;
 
-//    private List<SenderConfiguration> senders;
 
+    @XmlElementWrapper(name = "senders")
+    @XmlElement(name = "sender")
+    private Set<SenderConfiguration> senderConfigurations;
 
     public Set<ListenerConfiguration> getListenerConfigurations() {
         return Collections.unmodifiableSet(listenerConfigurations);
     }
 
+    public Set<SenderConfiguration> getSenderConfigurations() {
+        if (senderConfigurations == null) {
+            return Collections.EMPTY_SET;
+        }
+        return Collections.unmodifiableSet(senderConfigurations);
+    }
+
     public void setListenerConfigurations(Set<ListenerConfiguration> listenerConfigurations) {
         this.listenerConfigurations = Collections.unmodifiableSet(listenerConfigurations);
+    }
+
+    public void setSenderConfigurations(Set<SenderConfiguration> senderConfigurations) {
+        this.senderConfigurations = Collections.unmodifiableSet(senderConfigurations);
     }
 }

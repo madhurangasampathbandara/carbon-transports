@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2015 WSO2 Inc. (http://wso2.com) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -16,7 +16,7 @@
  *  under the License.
  *
  */
-package org.wso2.carbon.transport.http.netty.listener.ssl;
+package org.wso2.carbon.transport.http.netty.common.ssl;
 
 import io.netty.handler.ssl.SslHandler;
 

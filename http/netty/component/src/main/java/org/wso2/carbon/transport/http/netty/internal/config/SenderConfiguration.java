@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2015 WSO2 Inc. (http://wso2.com) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -18,11 +18,144 @@
  */
 package org.wso2.carbon.transport.http.netty.internal.config;
 
+
+import org.wso2.carbon.transport.http.netty.common.ssl.SSLConfig;
+import java.io.File;
+import java.util.List;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+
+
 /**
  * JAXB representation of the Netty transport sender configuration.
- *
- * TODO implementation
  */
 @SuppressWarnings("unused")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class SenderConfiguration {
+
+    public static final String DEFAULT_KEY = "netty";
+
+
+    public static SenderConfiguration getDefault() {
+        SenderConfiguration defaultConfig;
+        defaultConfig = new SenderConfiguration(DEFAULT_KEY);
+        return defaultConfig;
+    }
+
+    @XmlAttribute(required = true)
+    private String id;
+
+
+    @XmlAttribute
+    private String scheme = "http";
+
+    @XmlAttribute
+    private String keyStoreFile;
+
+    @XmlAttribute
+    private String keyStorePass;
+
+    @XmlAttribute
+    private String trustStoreFile;
+
+    @XmlAttribute
+    private String trustStorePass;
+
+    @XmlAttribute
+    private String certPass;
+
+    @XmlElementWrapper(name = "parameters")
+    @XmlElement(name = "parameter")
+    private List<Parameter> parameters;
+
+    public SenderConfiguration() {
+    }
+
+    public SenderConfiguration(String id) {
+        this.id = id;
+
+    }
+
+
+    public String getCertPass() {
+        return certPass;
+    }
+
+    public void setCertPass(String certPass) {
+        this.certPass = certPass;
+    }
+
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getKeyStoreFile() {
+        return keyStoreFile;
+    }
+
+    public void setKeyStoreFile(String keyStoreFile) {
+        this.keyStoreFile = keyStoreFile;
+    }
+
+    public String getKeyStorePass() {
+        return keyStorePass;
+    }
+
+    public void setKeyStorePass(String keyStorePass) {
+        this.keyStorePass = keyStorePass;
+    }
+
+
+    public String getScheme() {
+        return scheme;
+    }
+
+    public void setScheme(String scheme) {
+        this.scheme = scheme;
+    }
+
+
+    public List<Parameter> getParameters() {
+        return parameters;
+    }
+
+    public void setParameters(List<Parameter> parameters) {
+        this.parameters = parameters;
+    }
+
+    public SSLConfig getSslConfig() {
+        if (scheme == null || !scheme.equalsIgnoreCase("https")) {
+            return null;
+        }
+        if (certPass == null) {
+            certPass = keyStorePass;
+        }
+        if (trustStoreFile == null || trustStorePass == null) {
+            throw new IllegalArgumentException("TrusstoreFile or keyStorePass not defined for " +
+                                               "HTTPS scheme");
+        }
+        SSLConfig sslConfig = new SSLConfig(null, null).setCertPass(null);
+        if (keyStoreFile != null) {
+            File keyStore = new File(keyStoreFile);
+            if (!keyStore.exists()) {
+                throw new IllegalArgumentException("TrustStore File " + trustStoreFile + " not found");
+            }
+            sslConfig =
+                       new SSLConfig(keyStore, keyStorePass).setCertPass(certPass);
+        }
+            File trustStore = new File(trustStoreFile);
+
+            sslConfig.setTrustStore(trustStore).setTrustStorePass(trustStorePass);
+
+        return sslConfig;
+    }
 }

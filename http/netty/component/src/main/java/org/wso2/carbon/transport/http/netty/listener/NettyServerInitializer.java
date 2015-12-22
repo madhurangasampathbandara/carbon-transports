@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ * Copyright (c) 2015 WSO2 Inc. (http://wso2.com) All Rights Reserved.
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License.
@@ -22,9 +22,11 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.ssl.SslHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.carbon.transport.http.netty.internal.NettyTransportDataHolder;
-import org.wso2.carbon.transport.http.netty.listener.ssl.SSLConfig;
-import org.wso2.carbon.transport.http.netty.listener.ssl.SSLHandlerFactory;
+import org.wso2.carbon.messaging.CarbonTransportInitializer;
+import org.wso2.carbon.transport.http.netty.common.ssl.SSLConfig;
+import org.wso2.carbon.transport.http.netty.common.ssl.SSLHandlerFactory;
+import org.wso2.carbon.transport.http.netty.internal.NettyTransportContextHolder;
+
 
 /**
  * Handles initialization of the Netty Channel pipeline.
@@ -54,8 +56,9 @@ public class NettyServerInitializer extends ChannelInitializer<SocketChannel> {
         }
 
         // Add the rest of the handlers to the pipeline
-        CarbonNettyServerInitializer initializer =
-                NettyTransportDataHolder.getInstance().getChannelInitializer(transportID);
+        CarbonTransportInitializer initializer =
+                NettyTransportContextHolder.getInstance().getServerChannelInitializer(transportID);
+
         if (initializer != null) {
             if (log.isDebugEnabled()) {
                 log.debug("Calling CarbonNettyServerInitializer OSGi service " + initializer);

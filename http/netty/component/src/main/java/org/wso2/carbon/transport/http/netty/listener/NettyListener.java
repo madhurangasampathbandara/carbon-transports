@@ -1,13 +1,13 @@
 /**
- * Copyright (c) 2015, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
- *
+ * Copyright (c) 2015, WSO2 Inc. (http://wso2.com) All Rights Reserved.
+ * <p>
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -26,9 +26,10 @@ import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.wso2.carbon.kernel.transports.CarbonTransport;
-import org.wso2.carbon.transport.http.netty.Constants;
-import org.wso2.carbon.transport.http.netty.internal.NettyTransportDataHolder;
+import org.wso2.carbon.messaging.CarbonMessageProcessor;
+import org.wso2.carbon.messaging.CarbonTransportInitializer;
+import org.wso2.carbon.messaging.TransportListener;
+import org.wso2.carbon.transport.http.netty.internal.NettyTransportContextHolder;
 import org.wso2.carbon.transport.http.netty.internal.config.ListenerConfiguration;
 import org.wso2.carbon.transport.http.netty.internal.config.Parameter;
 
@@ -40,20 +41,17 @@ import java.util.Map;
 /**
  * A class that starts the netty server bootstrap in given port.
  */
-public class NettyListener extends CarbonTransport {
+public class NettyListener extends TransportListener {
     private static final Logger log = LoggerFactory.getLogger(NettyListener.class);
 
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
-    private String serverState = Constants.STATE_STOPPED;
     private ServerBootstrap bootstrap;
     private ListenerConfiguration nettyConfig;
 
     public NettyListener(ListenerConfiguration nettyConfig) {
         super(nettyConfig.getId());
         this.nettyConfig = nettyConfig;
-        bossGroup = new NioEventLoopGroup(nettyConfig.getBossThreadPoolSize());
-        workerGroup = new NioEventLoopGroup(nettyConfig.getWorkerThreadPoolSize());
     }
 
     public void start() {
@@ -62,6 +60,8 @@ public class NettyListener extends CarbonTransport {
     }
 
     private void startTransport() {
+        bossGroup = new NioEventLoopGroup(nettyConfig.getBossThreadPoolSize());
+        workerGroup = new NioEventLoopGroup(nettyConfig.getWorkerThreadPoolSize());
         bootstrap = new ServerBootstrap();
         bootstrap.option(ChannelOption.SO_BACKLOG, 100);
         bootstrap.group(bossGroup, workerGroup)
@@ -79,7 +79,6 @@ public class NettyListener extends CarbonTransport {
         setupChannelInitializer();
         try {
             bootstrap.bind(new InetSocketAddress(nettyConfig.getHost(), nettyConfig.getPort())).sync();
-            serverState = Constants.STATE_STARTED;
             log.info("Netty Listener starting on port " + nettyConfig.getPort());
         } catch (InterruptedException e) {
             log.error(e.getMessage(), e);
@@ -87,18 +86,23 @@ public class NettyListener extends CarbonTransport {
     }
 
     private void setupChannelInitializer() {
-        CarbonNettyServerInitializer channelInitializer =
-                NettyTransportDataHolder.getInstance().getChannelInitializer(nettyConfig.getId());
-        if (channelInitializer != null) {
-            List<Parameter> parameters = nettyConfig.getParameters();
-            if (parameters != null && !parameters.isEmpty()) {
-                Map<String, String> paramMap = new HashMap<>(parameters.size());
-                for (Parameter parameter : parameters) {
-                    paramMap.put(parameter.getName(), parameter.getValue());
-                }
-                channelInitializer.setup(paramMap);
-            }
+        CarbonTransportInitializer channelInitializer = NettyTransportContextHolder.getInstance()
+                .getServerChannelInitializer(nettyConfig.getId());
+        if (channelInitializer == null) {
+            // start with the default initializer
+            channelInitializer = new CarbonNettyServerInitializer();
         }
+
+        List<Parameter> parameters = nettyConfig.getParameters();
+        if (parameters != null && !parameters.isEmpty()) {
+            Map<String, String> paramMap = new HashMap<>(parameters.size());
+            for (Parameter parameter : parameters) {
+                paramMap.put(parameter.getName(), parameter.getValue());
+            }
+
+            channelInitializer.setup(paramMap);
+        }
+        NettyTransportContextHolder.getInstance().addNettyChannelInitializer(nettyConfig.getId(), channelInitializer);
     }
 
     private void addChannelInitializer() {
@@ -109,29 +113,22 @@ public class NettyListener extends CarbonTransport {
 
     @Override
     public void stop() {
-        serverState = Constants.STATE_TRANSITION;
         log.info("Stopping Netty transport " + id + " on port " + nettyConfig.getPort());
         shutdownEventLoops();
     }
 
     @Override
     public void beginMaintenance() {
-        serverState = Constants.STATE_TRANSITION;
         log.info("Putting Netty transport " + id + " on port " + nettyConfig.getPort() + " into maintenance mode");
         shutdownEventLoops();
     }
 
     @Override
     public void endMaintenance() {
-        serverState = Constants.STATE_TRANSITION;
         log.info("Ending maintenance mode for Netty transport " + id + " running on port " + nettyConfig.getPort());
         bossGroup = new NioEventLoopGroup(nettyConfig.getBossThreadPoolSize());
         workerGroup = new NioEventLoopGroup(nettyConfig.getWorkerThreadPoolSize());
         startTransport();
-    }
-
-    public String getState() {
-        return serverState;
     }
 
     private void shutdownEventLoops() {
@@ -145,10 +142,14 @@ public class NettyListener extends CarbonTransport {
                     public void operationComplete(Future<Object> future) throws Exception {
                         log.info("Netty transport " + id + " on port " + nettyConfig.getPort() +
                                 " stopped successfully");
-                        serverState = Constants.STATE_STOPPED;
                     }
                 });
             }
         });
+    }
+
+    @Override
+    public void setMessageProcessor(CarbonMessageProcessor carbonMessageProcessor) {
+
     }
 }

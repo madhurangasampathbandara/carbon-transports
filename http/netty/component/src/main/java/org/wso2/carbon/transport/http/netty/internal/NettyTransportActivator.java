@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2005-2014, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *  Copyright (c) 2015 WSO2 Inc. (http://wso2.com) All Rights Reserved.
  *
  *  WSO2 Inc. licenses this file to you under the Apache License,
  *  Version 2.0 (the "License"); you may not use this file except
@@ -21,9 +21,13 @@ package org.wso2.carbon.transport.http.netty.internal;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.wso2.carbon.kernel.transports.CarbonTransport;
+import org.wso2.carbon.messaging.TransportSender;
 import org.wso2.carbon.transport.http.netty.internal.config.ListenerConfiguration;
-import org.wso2.carbon.transport.http.netty.internal.config.TransportConfigurationBuilder;
+import org.wso2.carbon.transport.http.netty.internal.config.SenderConfiguration;
+import org.wso2.carbon.transport.http.netty.internal.config.TransportsConfiguration;
+import org.wso2.carbon.transport.http.netty.internal.config.YAMLTransportConfigurationBuilder;
 import org.wso2.carbon.transport.http.netty.listener.NettyListener;
+import org.wso2.carbon.transport.http.netty.sender.NettySender;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -38,6 +42,10 @@ public class NettyTransportActivator implements BundleActivator {
         for (NettyListener listener : createNettyListeners()) {
             bundleContext.registerService(CarbonTransport.class, listener, null);
         }
+        for (NettySender sender : createNettySenders()) {
+            bundleContext.registerService(TransportSender.class, sender, null);
+        }
+        NettyTransportContextHolder.getInstance().setBundleContext(bundleContext);
     }
 
     /**
@@ -47,12 +55,28 @@ public class NettyTransportActivator implements BundleActivator {
      */
     private Set<NettyListener> createNettyListeners() {
         Set<NettyListener> listeners = new HashSet<>();
+        TransportsConfiguration trpConfig = YAMLTransportConfigurationBuilder.build();
         Set<ListenerConfiguration> listenerConfigurations =
-                TransportConfigurationBuilder.build().getListenerConfigurations();
+                trpConfig.getListenerConfigurations();
         for (ListenerConfiguration listenerConfiguration : listenerConfigurations) {
             listeners.add(new NettyListener(listenerConfiguration));
         }
         return listeners;
+    }
+
+    /**
+     * Parse the  netty-transports.xml config file & create the Netty transport instances
+     *
+     * @return Netty transport instances
+     */
+    private Set<NettySender> createNettySenders() {
+        Set<NettySender> senders = new HashSet<>();
+        Set<SenderConfiguration> senderConfigurations =
+                YAMLTransportConfigurationBuilder.build().getSenderConfigurations();
+        for (SenderConfiguration senderConfiguration : senderConfigurations) {
+            senders.add(new NettySender(senderConfiguration));
+        }
+        return senders;
     }
 
 
